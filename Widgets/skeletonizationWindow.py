@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from Modules.BinarizationMethodsList import binarizationMethods
 
 class Ui_SkeletonitationWindow(QtWidgets.QWidget):
-    binarizationMethodChangedSignal = QtCore.pyqtSignal(str)
+    binarizationMethodChangedSignal = QtCore.pyqtSignal(int)
     thresholdValueChangedSignal = QtCore.pyqtSignal(int)
 
     def setupUi(self, SkeletonitationWindow):
@@ -33,11 +34,7 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         font.setPointSize(14)
         self.binarizationMethodsComboBox.setFont(font)
         self.binarizationMethodsComboBox.setObjectName("binarizationMethodsComboBox")
-        self.binarizationMethodsComboBox.addItems(
-            [
-                "Threshold Binary"
-            ]
-        )
+        self.binarizationMethodsComboBox.addItems(binarizationMethods)
         self.binarizationMethodsComboBox.activated[str].connect(self.onBinarizationMethodChanged)
         self.horizontalLayout.addWidget(self.binarizationMethodsComboBox)
         self.widget1 = QtWidgets.QWidget(SkeletonitationWindow)
@@ -108,7 +105,12 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.thresholdValueChangedSignal.emit(value)
 
     def onBinarizationMethodChanged(self, method):
-        self.binarizationMethodChangedSignal.emit(method)
+        methodIndex = binarizationMethods.index(method)
+        if methodIndex == 1:
+            self.thresholdValueSlider.setEnabled(True)
+        else:
+            self.thresholdValueSlider.setEnabled(False)
+        self.binarizationMethodChangedSignal.emit(methodIndex)
 
     def retranslateUi(self, SkeletonitationWindow):
         _translate = QtCore.QCoreApplication.translate

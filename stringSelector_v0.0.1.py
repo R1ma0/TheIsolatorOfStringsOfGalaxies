@@ -3,7 +3,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Widgets.skeletonizationWindow import Ui_SkeletonitationWindow
 from Modules.ImageUtilities import IUtils
-from Modules.ImageBinarizationMethods import ThresholdBinarization 
+from Modules.ImageBinarizationMethods import ThresholdBinarization, BrightnessBinarization
 import imutils
 
 class Ui_MainWindow(object):
@@ -57,6 +57,7 @@ class Ui_MainWindow(object):
 
         self.filename = None # Stores the name of the uploaded file
         self.loadedImage = None # Stores the original uploaded image
+        self.selectedBinarizationMethod = None
 
     def openSkeletonizationWindow(self):
         self.baseSkeletonizationWindow = QtWidgets.QMainWindow()
@@ -67,15 +68,29 @@ class Ui_MainWindow(object):
         self.baseSkeletonizationWindow.show()
 
     def setThresholdValue(self, value):
-        self.applyBinarizationMethodToImage(value=value)
+        self.applyBinarizationMethodToImage(self.selectedBinarizationMethod, value=value)
 
     def setBinarizationMethod(self, method):
-        self.applyBinarizationMethodToImage(method=method)
+        self.applyBinarizationMethodToImage(method)
 
-    def applyBinarizationMethodToImage(self, value=125, method=None):
-        thresholdMethod = ThresholdBinarization(self.loadedImage, value)
-        _, thresholdImage = thresholdMethod.convert()
-        self.viewImage(thresholdImage)
+    def applyBinarizationMethodToImage(self, method, value=125):
+        self.selectedBinarizationMethod = method
+        thresholdImage = None
+
+        if self.loadedImage is None:
+            return
+
+        if method == 1:
+            thresholdMethod = ThresholdBinarization(self.loadedImage, value)
+            _, thresholdImage = thresholdMethod.convert()
+        elif method == 2:
+            thresholdMethod = BrightnessBinarization(self.loadedImage)
+            thresholdImage = thresholdMethod.convert()
+        else:
+            pass
+
+        if thresholdImage is not None:
+            self.viewImage(thresholdImage)
 
     def loadImage(self):
         self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg)")[0]
@@ -84,26 +99,14 @@ class Ui_MainWindow(object):
 
     def saveImage(self):
         options = QtWidgets.QFileDialog.Options()
-        saveToFilename, check = QtWidgets.QFileDialog.getSaveFileName(
-            None, 
-            "Save Image",
-            "",
-            "All Files (*)",
-            options=options
-        )
+        saveToFilename, check = QtWidgets.QFileDialog.getSaveFileName(None, "Save Image", "", "All Files (*)", options=options)
         if check:
             IUtils.writeImageTo(saveToFilename, self.changedImage)
 
     def viewImage(self, image):
         image = imutils.resize(image, 800)
         image = IUtils.BGR2RGB(image)
-        image = QtGui.QImage(
-            image, 
-            image.shape[1], 
-            image.shape[0],
-            image.strides[0],
-            QtGui.QImage.Format_RGB888
-        )
+        image = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         self.imageViewLabel.setPixmap(QtGui.QPixmap.fromImage(image))
 
     def retranslateUi(self, MainWindow):
