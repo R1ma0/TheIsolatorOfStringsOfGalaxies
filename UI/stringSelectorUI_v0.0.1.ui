@@ -75,6 +75,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionSkeletonization"/>
+    <addaction name="actionResizeImage"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -92,6 +93,11 @@
   <action name="actionSkeletonization">
    <property name="text">
     <string>Skeletonization</string>
+   </property>
+  </action>
+  <action name="actionResizeImage">
+   <property name="text">
+    <string>Resize Image</string>
    </property>
   </action>
  </widget>
