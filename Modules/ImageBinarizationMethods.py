@@ -5,20 +5,13 @@ import numpy
 binaryMethods = [
     "Threshold Binary",
     "Brightness Threshold",
-    "Adaprive Gaussian"
+    "Adaprive Gaussian",
+    "Otsu`s Threshold"
 ]
 
 class ImageBinarization(object):
     """ 
     The class implements image binarization methods
-
-    Methods
-    -------
-        convertUsingThresholdBinarization(self, image: cv2.Mat, thresholdValue: int) -> cv2.Mat
-
-        convertUsingBrightnessBinarization(self, image: cv2.Mat) -> cv2.Mat
-
-        convertUsingAdaptiveGaussianBinarization(self, image: cv2.Mat, blockSize: int, c: float) -> cv2.Mat
     """
     def __init__(self):
         self.brightnessBinarization = BrightnessBinarization()
@@ -56,31 +49,16 @@ class ImageBinarization(object):
             self.imageUtils.BGR2GRAY(image), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, c
         )
 
-    def convertUsingOtsuThresholding(self):
-        pass
+    def convertUsingOtsuThresholding(self, image: cv2.Mat):
+        return cv2.threshold(self.imageUtils.BGR2GRAY(image), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
 class BrightnessBinarization(object):
     """ 
     The class implements binarization based on the average brightness of the image 
-    
-    Methods
-    -------
-        convert(sourceImage: cv2.Mat) -> cv2.Mat
-            Converts the source image to binary
-
-        __calculateAverageBrightness() -> float
-            The method calculates the average brightnesss of the image
-
-        __binarizeImage(self, image: cv2.Mat) -> cv2.Mat
-            The method for each pixel compares its average brightness
-            with the average brightness of the image
-
-        __getPixelBrightness(self, pixel: list) -> float
-            The method calculates the brightness of the pixel
     """
     def __init__(self, ):
-        self.white = (255, 255, 255)
-        self.black = (0, 0, 0)
+        self.white = [255, 255, 255]
+        self.black = [0, 0, 0]
 
     def convert(self, sourceImage: cv2.Mat) -> cv2.Mat:
         """ 
@@ -92,10 +70,10 @@ class BrightnessBinarization(object):
                 The source image to convert (a set of image pixels)
         """
         self.height, self.width, _ = sourceImage.shape
-        self.averageImageBrightness = self.__calculateAverageBrightness()
+        self.averageImageBrightness = self.__calculateAverageBrightness(sourceImage)
         return self.__binarizeImage(sourceImage)
 
-    def __calculateAverageBrightness(self) -> float:
+    def __calculateAverageBrightness(self, image: cv2.Mat) -> float:
         """ 
         The method calculates the average brightnesss of the image 
 
@@ -108,7 +86,7 @@ class BrightnessBinarization(object):
 
         for i in range(0, self.height):
             for j in range(0, self.width):
-                self.pixelsBrightness[i, j] = self.__getPixelBrightness(self.image[i, j])
+                self.pixelsBrightness[i, j] = self.__getPixelBrightness(image[i, j])
 
         return self.pixelsBrightness.sum() / (self.width * self.height)
     

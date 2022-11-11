@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Widgets.skeletonizationWindow import Ui_SkeletonitationWindow
+from Widgets.binarizationWindow import Ui_SkeletonitationWindow
 from Modules.ImageUtilities import IUtils
 from Modules.ImageBinarizationMethods import ImageBinarization, binaryMethods
+from Modules.ImageSkeletonizationMethods import OPCASkeletonization, ZSSkeletonization
 import imutils
 
 class Ui_MainWindow(object):
@@ -34,6 +35,8 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName("menuFile")
         self.menuTools = QtWidgets.QMenu(self.menubar)
         self.menuTools.setObjectName("menuTools")
+        self.menuSkeletonization = QtWidgets.QMenu(self.menuTools)
+        self.menuSkeletonization.setObjectName("menuSkeletonization")
         MainWindow.setMenuBar(self.menubar)
         self.actionOpen_Image = QtWidgets.QAction(MainWindow)
         self.actionOpen_Image.setObjectName("actionOpen_Image")
@@ -41,14 +44,22 @@ class Ui_MainWindow(object):
         self.actionSave_Image = QtWidgets.QAction(MainWindow)
         self.actionSave_Image.setObjectName("actionSave_Image")
         self.actionSave_Image.setShortcut("Ctrl+S")
-        self.actionSkeletonization = QtWidgets.QAction(MainWindow)
-        self.actionSkeletonization.setObjectName("actionSkeletonization")
+        self.actionBinarization = QtWidgets.QAction(MainWindow)
+        self.actionBinarization.setObjectName("actionBinarization")
+        self.actionBinarization.setEnabled(False)
         self.actionResizeImage = QtWidgets.QAction(MainWindow)
         self.actionResizeImage.setObjectName("actionResizeImage")
+        self.actionOPCAMethod = QtWidgets.QAction(MainWindow)
+        self.actionOPCAMethod.setObjectName("actionOPCAMethod")
+        self.actionZSMethod = QtWidgets.QAction(MainWindow)
+        self.actionZSMethod.setObjectName("actionZSMethod")
         self.menuFile.addAction(self.actionOpen_Image)
         self.menuFile.addAction(self.actionSave_Image)
-        self.menuTools.addAction(self.actionSkeletonization)
+        self.menuTools.addAction(self.actionBinarization)
         self.menuTools.addAction(self.actionResizeImage)
+        self.menuTools.addAction(self.menuSkeletonization.menuAction())
+        self.menuSkeletonization.addAction(self.actionOPCAMethod)
+        self.menuSkeletonization.addAction(self.actionZSMethod)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
 
@@ -57,36 +68,40 @@ class Ui_MainWindow(object):
         self.actionResizeImage.triggered.connect(self.resizeImage)
         self.actionOpen_Image.triggered.connect(self.loadImage)
         self.actionSave_Image.triggered.connect(self.saveImage)
-        self.actionSkeletonization.triggered.connect(self.openSkeletonizationWindow)
+        self.actionBinarization.triggered.connect(self.openBinarizationWindow)
+        self.actionOPCAMethod.triggered.connect(self.performOPCASkeletonization)
+        self.actionZSMethod.triggered.connect(self.performZSSkeletonization)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.setupVariables()
         
     def setupVariables(self):
         self.filename = None # Stores the name of the uploaded file
-        self.loadedImage = None # Stores the original uploaded image
+        self.imageToChange = None
+        self.loadedImage = None
         self.selectedBinarizationMethod = None
         self.selectedThresholdValue = None
-        self.editableImage = None
         self.gaussianBlockSizeValue = None
         self.gaussianCValue = None
 
         self.binarizationMethodsList = [""] + binaryMethods
         self.binarizationMethods = ImageBinarization()
+        self.opcaSkeletonization = OPCASkeletonization()
+        self.zsSkeletonization = ZSSkeletonization()
         self.imageUtils = IUtils()
 
-    def openSkeletonizationWindow(self):
-        self.baseSkeletonizationWindow = QtWidgets.QMainWindow()
-        self.skeletonizationWindow = Ui_SkeletonitationWindow()
-        self.skeletonizationWindow.setupUi(self.baseSkeletonizationWindow)
-        self.skeletonizationWindow.binarizationMethodChangedSignal.connect(self.setBinarizationMethod)
-        self.skeletonizationWindow.thresholdValueChangedSignal.connect(self.setThresholdValue)
-        self.skeletonizationWindow.binaryThresholdValueSpinBoxSignal.connect(self.setThresholdValue)
-        self.skeletonizationWindow.gaussianCSpinBoxSignal.connect(self.setGaussianCValue)
-        self.skeletonizationWindow.gaussianCValueSliderSignal.connect(self.setGaussianCValue)
-        self.skeletonizationWindow.gaussianBlockSizeSpinBoxSignal.connect(self.setGaussianBlockSizeValue)
-        self.skeletonizationWindow.gaussianBlockSizeValueSliderSignal.connect(self.setGaussianBlockSizeValue)
-        self.baseSkeletonizationWindow.show()
+    def openBinarizationWindow(self):
+        self.baseBinarizationWindow = QtWidgets.QMainWindow()
+        self.binarizationWindow = Ui_SkeletonitationWindow()
+        self.binarizationWindow.setupUi(self.baseBinarizationWindow)
+        self.binarizationWindow.binarizationMethodChangedSignal.connect(self.setBinarizationMethod)
+        self.binarizationWindow.thresholdValueChangedSignal.connect(self.setThresholdValue)
+        self.binarizationWindow.binaryThresholdValueSpinBoxSignal.connect(self.setThresholdValue)
+        self.binarizationWindow.gaussianCSpinBoxSignal.connect(self.setGaussianCValue)
+        self.binarizationWindow.gaussianCValueSliderSignal.connect(self.setGaussianCValue)
+        self.binarizationWindow.gaussianBlockSizeSpinBoxSignal.connect(self.setGaussianBlockSizeValue)
+        self.binarizationWindow.gaussianBlockSizeValueSliderSignal.connect(self.setGaussianBlockSizeValue)
+        self.baseBinarizationWindow.show()
 
     def setGaussianCValue(self, value):
         self.gaussianCValue = value
@@ -103,53 +118,62 @@ class Ui_MainWindow(object):
 
     def setBinarizationMethod(self, method):
         self.selectedBinarizationMethod = method
+        self.applyBinarizationMethodToImage()
 
     def applyBinarizationMethodToImage(self):
-        if self.loadedImage is None:
-            return
-
         if self.selectedBinarizationMethod == 1:
-            self.editableImage = self.binarizationMethods.convertUsingThresholdBinarization(
+            self.imageToChange = self.binarizationMethods.convertUsingThresholdBinarization(
                 self.loadedImage, self.selectedThresholdValue
             )
         elif self.selectedBinarizationMethod == 2:
-            self.editableImage = self.binarizationMethods.convertUsingBrightnessBinarization(
+            self.imageToChange = self.binarizationMethods.convertUsingBrightnessBinarization(
                 self.loadedImage
             )
         elif self.selectedBinarizationMethod == 3:
-            self.editableImage = self.binarizationMethods.convertUsingAdaptiveGaussianBinarization(
+            self.imageToChange = self.binarizationMethods.convertUsingAdaptiveGaussianBinarization(
                 self.loadedImage, self.gaussianBlockSizeValue, self.gaussianCValue
             )
+        elif self.selectedBinarizationMethod == 4:
+            self.imageToChange = self.binarizationMethods.convertUsingOtsuThresholding(self.loadedImage)
         else:
             pass
 
-        if self.editableImage is not None:
-            self.viewImage(self.editableImage)
+        self.viewImage(self.imageToChange)
 
-    def resizeImage(self):
-        if self.editableImage is None:
-            return
-        
-        imageScalingVariant = [str(x) for x in range(5, 100, 5)]
+    def performOPCASkeletonization(self):
+        self.imageToChange = self.opcaSkeletonization.execute(self.imageToChange)
+        self.viewImage(self.imageToChange)
+
+    def performZSSkeletonization(self):
+        self.imageToChange = self.zsSkeletonization.execute(self.imageToChange)
+        self.viewImage(self.imageToChange)
+
+    def resizeImage(self): 
+        imageScalingVariant = [str(x) for x in range(1, 100, 1)]
         element, isSelected = QtWidgets.QInputDialog.getItem(
-            MainWindow, "Resize", "Variants:", imageScalingVariant
+            MainWindow, "Resize", "%:", imageScalingVariant
         )
 
         if isSelected:
-            self.editableImage = self.imageUtils.resizeImage(self.editableImage, int(element.replace('%', '')))
-            self.viewImage(self.editableImage)
+            try:
+                self.imageToChange = self.imageUtils.resizeImage(self.imageToChange, int(element))
+                self.viewImage(self.imageToChange)
+            except Exception as e:
+                print(e)
 
     def loadImage(self):
         self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg)")[0]
+        if not self.filename:
+            return
         self.loadedImage = self.imageUtils.readImageFrom(self.filename)
-        self.editableImage = None
+        self.actionBinarization.setEnabled(True)
         self.viewImage(self.loadedImage)
 
     def saveImage(self):
         options = QtWidgets.QFileDialog.Options()
         saveToFilename, check = QtWidgets.QFileDialog.getSaveFileName(None, "Save Image", "", "All Files (*)", options=options)
         if check:
-            self.imageUtils.writeImageTo(saveToFilename, self.editableImage)
+            self.imageUtils.writeImageTo(saveToFilename, self.imageToChange)
 
     def viewImage(self, image):
         image = imutils.resize(image, 800)
@@ -159,14 +183,17 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "String Selector v0.1.3"))
-        self.imageViewLabel.setText(_translate("MainWindow", "Image View Label"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "String Selector v0.2.1"))
+        self.imageViewLabel.setText(_translate("MainWindow", "Image View"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTools.setTitle(_translate("MainWindow", "Tools"))
+        self.menuSkeletonization.setTitle(_translate("MainWindow", "Skeletonization"))
         self.actionOpen_Image.setText(_translate("MainWindow", "Open Image"))
         self.actionSave_Image.setText(_translate("MainWindow", "Save Image"))
-        self.actionSkeletonization.setText(_translate("MainWindow", "Skeletonization"))
+        self.actionBinarization.setText(_translate("MainWindow", "Binarization"))
         self.actionResizeImage.setText(_translate("MainWindow", "Resize Image"))
+        self.actionOPCAMethod.setText(_translate("MainWindow", "OPCA (One-Pass Combination Algorithm)"))
+        self.actionZSMethod.setText(_translate("MainWindow", "ZS (Zhang-Suen Algorithm)"))
 
 if __name__ == "__main__":
     import sys

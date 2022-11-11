@@ -15,9 +15,9 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
 
     def setupUi(self, SkeletonitationWindow):
         SkeletonitationWindow.setObjectName("SkeletonitationWindow")
-        SkeletonitationWindow.resize(441, 395)
+        SkeletonitationWindow.resize(441, 496)
         self.layoutWidget = QtWidgets.QWidget(SkeletonitationWindow)
-        self.layoutWidget.setGeometry(QtCore.QRect(10, 10, 421, 33))
+        self.layoutWidget.setGeometry(QtCore.QRect(10, 50, 421, 33))
         self.layoutWidget.setObjectName("layoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -43,7 +43,7 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.horizontalLayout.addWidget(self.binarizationMethodsComboBox)
         self.binaryThresholdGroupBox = QtWidgets.QGroupBox(SkeletonitationWindow)
         self.binaryThresholdGroupBox.setEnabled(False)
-        self.binaryThresholdGroupBox.setGeometry(QtCore.QRect(10, 60, 421, 121))
+        self.binaryThresholdGroupBox.setGeometry(QtCore.QRect(10, 100, 421, 121))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -109,7 +109,7 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.adaptiveGaussianGroupBox = QtWidgets.QGroupBox(SkeletonitationWindow)
         self.adaptiveGaussianGroupBox.setEnabled(False)
-        self.adaptiveGaussianGroupBox.setGeometry(QtCore.QRect(10, 210, 421, 181))
+        self.adaptiveGaussianGroupBox.setGeometry(QtCore.QRect(10, 250, 421, 181))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -193,6 +193,12 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.gaussianCMaxValueLabel.setObjectName("gaussianCMaxValueLabel")
         self.horizontalLayout_7.addWidget(self.gaussianCMaxValueLabel)
         self.verticalLayout_2.addLayout(self.horizontalLayout_7)
+        self.widget = QtWidgets.QWidget(SkeletonitationWindow)
+        self.widget.setGeometry(QtCore.QRect(10, 10, 263, 23))
+        self.widget.setObjectName("widget")
+        self.horizontalLayout_8 = QtWidgets.QHBoxLayout(self.widget)
+        self.horizontalLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
 
         self.retranslateUi(SkeletonitationWindow)
         # Enables

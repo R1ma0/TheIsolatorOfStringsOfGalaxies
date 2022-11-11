@@ -27,7 +27,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Image View Label</string>
+       <string>Image View</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -74,8 +74,16 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionSkeletonization"/>
+    <widget class="QMenu" name="menuSkeletonization">
+     <property name="title">
+      <string>Skeletonization</string>
+     </property>
+     <addaction name="actionOPCA_One_Pass_Combination_Algorithm"/>
+     <addaction name="actionZS_Zhang_Suen"/>
+    </widget>
+    <addaction name="actionBinarization"/>
     <addaction name="actionResizeImage"/>
+    <addaction name="menuSkeletonization"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -90,14 +98,43 @@
     <string>Save Image</string>
    </property>
   </action>
-  <action name="actionSkeletonization">
+  <action name="actionBinarization">
    <property name="text">
-    <string>Skeletonization</string>
+    <string>Binarization</string>
    </property>
   </action>
   <action name="actionResizeImage">
    <property name="text">
     <string>Resize Image</string>
+   </property>
+  </action>
+  <action name="actionUse_LoadedImage">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use Loaded</string>
+   </property>
+  </action>
+  <action name="actionUse_EditedImage">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use Edited</string>
+   </property>
+  </action>
+  <action name="actionOPCA_One_Pass_Combination_Algorithm">
+   <property name="text">
+    <string>OPCA (One-Pass Combination Algorithm)</string>
+   </property>
+  </action>
+  <action name="actionZS_Zhang_Suen">
+   <property name="text">
+    <string>ZS (Zhang-Suen)</string>
    </property>
   </action>
  </widget>

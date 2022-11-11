@@ -1,0 +1,6 @@
+*.png
+*.jpg
+*.bat
+*.pyc
+
+__pycache__/
