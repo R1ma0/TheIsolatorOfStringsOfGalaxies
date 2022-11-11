@@ -2,12 +2,31 @@ from Modules.ImageUtilities import IUtils
 import cv2
 import numpy
 
+"""
+IPE - The number of ignored pixels at the end
+"""
+def deleteSinglePixels(matrix: numpy.array, getNeighboursMethod, rows: int, cols: int, IPE) -> numpy.array:
+    pixelsToChange = []
+    
+    for i in range(1, rows - IPE):
+        for j in range(1, cols - IPE):
+            neighbours = getNeighboursMethod(i, j)
+            if numpy.sum(neighbours[1:9]) == 0:
+                pixelsToChange.append((i, j))
+
+    for i, j in pixelsToChange:
+        matrix[i, j] = 0
+    
+    return matrix
+
 class OPCASkeletonization(object):
     """
     Implementation of the One-Pass Combination Algorithm skeletonization method
     """
     def execute(self, srcImage: cv2.Mat) -> cv2.Mat:
         self.matrix = IUtils.convertToBinaryMatrix(srcImage)
+        rows = srcImage.shape[0]
+        colums = srcImage.shape[1]
         notAllElementsRemoved = True
 
         # Iterative processing of the image matrix
@@ -15,8 +34,8 @@ class OPCASkeletonization(object):
             self.deletedElementsCounter = 0
 
             # Removing extra matrix elements
-            for row in range(1, srcImage.shape[0] - 2):
-                for col in range(1, srcImage.shape[1] - 2):
+            for row in range(1, rows - 2):
+                for col in range(1, colums - 2):
                     if self.matrix[row, col] == 1:
                         neighbours = self.__getNeighbours(row, col)
                         if self.__isSatisfiesFirstCondition(neighbours) and \
@@ -30,12 +49,14 @@ class OPCASkeletonization(object):
                 notAllElementsRemoved = False
 
         # Removing extra matrix elements
-        for row in range(1, srcImage.shape[0] - 2):
-            for col in range(1, srcImage.shape[1] - 2):
+        for row in range(1, rows - 2):
+            for col in range(1, colums - 2):
                 if self.matrix[row, col] == 1:
                     neighbours = self.__getNeighbours(row, col)
                     if self.__isSatisfiesFourthCondition(neighbours):
                         self.matrix[row, col] = 0
+
+        deleteSinglePixels(self.matrix, self.__getNeighbours, rows, colums, 2)
 
         print("OPCA skeletonization is done")
         return IUtils.makeChangesToSourceImage(self.matrix, srcImage)
@@ -133,6 +154,8 @@ class ZSSkeletonization(object):
 
             for x, y in stepTwoChanges:
                 self.matrix[x, y] = 0
+
+        deleteSinglePixels(self.matrix, self.__getNeighbours, rows, columns, 1)
 
         print("ZS skeletonization is done")
         return IUtils.makeChangesToSourceImage(self.matrix, image)
