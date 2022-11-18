@@ -51,3 +51,37 @@ class IUtils(object):
                 image[x, y] = 255 if matrix[x, y] == 1 else 0
 
         return image
+
+    """
+    IPE - The number of ignored pixels at the end
+    """
+    @staticmethod
+    def deleteSinglePixels(matrix: numpy.array, getNeighboursMethod, rows: int, cols: int, IPE) -> numpy.array:
+        pixelsToChange = []
+    
+        for i in range(1, rows - IPE):
+            for j in range(1, cols - IPE):
+                neighbours = getNeighboursMethod(matrix, i, j)
+                if numpy.sum(neighbours[1:9]) == 0:
+                    pixelsToChange.append((i, j))
+
+        for i, j in pixelsToChange:
+            matrix[i, j] = 0
+    
+        return matrix
+
+    @staticmethod
+    def getPixelNeighbours(matrix: numpy.array, x: int, y: int) -> list:
+        """
+        Return 8-neighbours of image pixel
+        """
+        return [
+            matrix[x - 1, y    ],
+            matrix[x - 1, y + 1],
+            matrix[x    , y + 1],
+            matrix[x + 1, y + 1],
+            matrix[x + 1, y    ],
+            matrix[x + 1, y - 1],
+            matrix[x    , y - 1],
+            matrix[x - 1, y - 1],
+        ]

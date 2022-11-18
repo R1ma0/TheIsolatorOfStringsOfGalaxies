@@ -2,23 +2,6 @@ from Modules.ImageUtilities import IUtils
 import cv2
 import numpy
 
-"""
-IPE - The number of ignored pixels at the end
-"""
-def deleteSinglePixels(matrix: numpy.array, getNeighboursMethod, rows: int, cols: int, IPE) -> numpy.array:
-    pixelsToChange = []
-    
-    for i in range(1, rows - IPE):
-        for j in range(1, cols - IPE):
-            neighbours = getNeighboursMethod(i, j)
-            if numpy.sum(neighbours[1:9]) == 0:
-                pixelsToChange.append((i, j))
-
-    for i, j in pixelsToChange:
-        matrix[i, j] = 0
-    
-    return matrix
-
 class OPCASkeletonization(object):
     """
     Implementation of the One-Pass Combination Algorithm skeletonization method
@@ -56,7 +39,7 @@ class OPCASkeletonization(object):
                     if self.__isSatisfiesFourthCondition(neighbours):
                         self.matrix[row, col] = 0
 
-        deleteSinglePixels(self.matrix, self.__getNeighbours, rows, colums, 2)
+        IUtils.deleteSinglePixels(self.matrix, self.__getNeighbours, rows, colums, 2)
 
         print("OPCA skeletonization is done")
         return IUtils.makeChangesToSourceImage(self.matrix, srcImage)
@@ -126,7 +109,7 @@ class ZSSkeletonization(object):
             stepOneChanges = []
             for x in range(1, rows - 1):
                 for y in range(1, columns - 1):
-                    P2, P3, P4, P5, P6, P7, P8, P9 = n = self.__getNeighbours(x, y)
+                    P2, P3, P4, P5, P6, P7, P8, P9 = n = IUtils.getPixelNeighbours(self.matrix, x, y)
                     if (
                         self.matrix[x, y] == 1 and
                         2 <= sum(n) <= 6 and
@@ -142,7 +125,7 @@ class ZSSkeletonization(object):
             stepTwoChanges = []
             for x in range(1, rows - 1):
                 for y in range(1, columns - 1):
-                    P2, P3, P4, P5, P6, P7, P8, P9 = n = self.__getNeighbours(x, y)
+                    P2, P3, P4, P5, P6, P7, P8, P9 = n = IUtils.getPixelNeighbours(self.matrix, x, y)
                     if (
                         self.matrix[x, y] == 1 and
                         2 <= sum(n) <= 6 and
@@ -155,25 +138,10 @@ class ZSSkeletonization(object):
             for x, y in stepTwoChanges:
                 self.matrix[x, y] = 0
 
-        deleteSinglePixels(self.matrix, self.__getNeighbours, rows, columns, 1)
+        IUtils.deleteSinglePixels(self.matrix, IUtils.getPixelNeighbours, rows, columns, 1)
 
         print("ZS skeletonization is done")
         return IUtils.makeChangesToSourceImage(self.matrix, image)
-
-    def __getNeighbours(self, x: int, y: int) -> list:
-        """
-        Return 8-neighbours of image[x, y]
-        """
-        return [
-            self.matrix[x - 1, y    ], # P2
-            self.matrix[x - 1, y + 1], # P3
-            self.matrix[x    , y + 1], # P4
-            self.matrix[x + 1, y + 1], # P5
-            self.matrix[x + 1, y    ], # P6
-            self.matrix[x + 1, y - 1], # P7
-            self.matrix[x    , y - 1], # P8
-            self.matrix[x - 1, y - 1]  # P9
-        ]
 
     def __getTransitions(self, neighbours: list) -> int:
         """
