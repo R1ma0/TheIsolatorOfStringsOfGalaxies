@@ -110,7 +110,10 @@ class Ui_MainWindow(object):
     def setGaussianBlockSizeValue(self, value):
         if value % 2 == 1:
             self.gaussianBlockSizeValue = value
-        self.applyBinarizationMethodToImage()
+        try:
+            self.applyBinarizationMethodToImage()
+        except ValueError as e:
+            print("The value of the block size must be equal 'value % 2 == 1'. \n {}".format(e))
 
     def setThresholdValue(self, value):
         self.selectedThresholdValue = value
@@ -126,14 +129,10 @@ class Ui_MainWindow(object):
                 self.loadedImage, self.selectedThresholdValue
             )
         elif self.selectedBinarizationMethod == 2:
-            self.imageToChange = self.binarizationMethods.convertUsingBrightnessBinarization(
-                self.loadedImage
-            )
-        elif self.selectedBinarizationMethod == 3:
             self.imageToChange = self.binarizationMethods.convertUsingAdaptiveGaussianBinarization(
                 self.loadedImage, self.gaussianBlockSizeValue, self.gaussianCValue
             )
-        elif self.selectedBinarizationMethod == 4:
+        elif self.selectedBinarizationMethod == 3:
             self.imageToChange = self.binarizationMethods.convertUsingOtsuThresholding(self.loadedImage)
         else:
             pass
