@@ -103,7 +103,7 @@ class ZSSkeletonization(object):
         stepOneChanges = stepTwoChanges = 1
         rows = image.shape[0] # height
         columns = image.shape[1] # width
-
+        
         while stepOneChanges or stepTwoChanges:
             # Step 1
             stepOneChanges = []

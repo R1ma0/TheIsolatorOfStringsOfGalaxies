@@ -24,15 +24,6 @@ class ImageBinarization(object):
     def convertUsingAdaptiveGaussianBinarization(self, image: cv2.Mat, blockSize: int, c: float) -> cv2.Mat:
         """
         Converts the source image to a binary using adaptive Gaussian binarization
-
-        Parameters
-        ----------
-            image: cv2.Mat
-                The source image to convert
-            blockSize: int
-                Pixel neighborhood size used to compute threshold value
-            c: float
-                This value simply lets us fine tune our threshold value
         """
         if blockSize == None: blockSize = 3
         if c == None: c = 0

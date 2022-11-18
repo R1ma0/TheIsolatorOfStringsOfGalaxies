@@ -64,7 +64,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuTools.menuAction())
 
         self.retranslateUi(MainWindow)
-        # Triggers
         self.actionResizeImage.triggered.connect(self.resizeImage)
         self.actionOpen_Image.triggered.connect(self.loadImage)
         self.actionSave_Image.triggered.connect(self.saveImage)
@@ -76,14 +75,6 @@ class Ui_MainWindow(object):
         self.setupVariables()
         
     def setupVariables(self):
-        self.filename = None # Stores the name of the uploaded file
-        self.imageToChange = None
-        self.loadedImage = None
-        self.selectedBinarizationMethod = None
-        self.selectedThresholdValue = None
-        self.gaussianBlockSizeValue = None
-        self.gaussianCValue = None
-
         self.binarizationMethodsList = [""] + binaryMethods
         self.binarizationMethods = ImageBinarization()
         self.opcaSkeletonization = OPCASkeletonization()
@@ -161,7 +152,7 @@ class Ui_MainWindow(object):
                 print(e)
 
     def loadImage(self):
-        self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg)")[0]
+        self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg *.tif)")[0]
         if not self.filename:
             return
         self.loadedImage = self.imageUtils.readImageFrom(self.filename)
