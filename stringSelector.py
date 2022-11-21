@@ -86,10 +86,19 @@ class Ui_MainWindow(object):
         self.binarizationMethods = ImageBinarization()
         self.opcaSkeletonization = OPCASkeletonization()
         self.zsSkeletonization = ZSSkeletonization()
-        self.imageUtils = IUtils()
 
     def removeExtraPixels(self):
-        print("removeExtraPixels()")
+        matrix = IUtils.convertToBinaryMatrix(self.imageToChange)
+        rows = self.imageToChange.shape[0]
+        cols = self.imageToChange.shape[1]
+        matrix = IUtils.deleteSinglePixels(
+                matrix, 
+                IUtils.getPixelNeighbours,
+                rows,
+                cols,
+                1
+        )
+        self.imageToChange = IUtils.makeChangesToSourceImage(matrix, self.imageToChange)
 
     def openBinarizationWindow(self):
         self.baseBinarizationWindow = QtWidgets.QMainWindow()
@@ -156,7 +165,7 @@ class Ui_MainWindow(object):
 
         if isSelected:
             try:
-                self.imageToChange = self.imageUtils.resizeImage(self.imageToChange, int(element))
+                self.imageToChange = IUtils.resizeImage(self.imageToChange, int(element))
                 self.viewImage(self.imageToChange)
             except Exception as e:
                 print(e)
@@ -165,7 +174,7 @@ class Ui_MainWindow(object):
         self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg *.tif)")[0]
         if not self.filename:
             return
-        self.loadedImage = self.imageUtils.readImageFrom(self.filename)
+        self.loadedImage = IUtils.readImageFrom(self.filename)
         self.actionBinarization.setEnabled(True)
         self.viewImage(self.loadedImage)
 
@@ -173,11 +182,11 @@ class Ui_MainWindow(object):
         options = QtWidgets.QFileDialog.Options()
         saveToFilename, check = QtWidgets.QFileDialog.getSaveFileName(None, "Save Image", "", "All Files (*)", options=options)
         if check:
-            self.imageUtils.writeImageTo(saveToFilename, self.imageToChange)
+            IUtils.writeImageTo(saveToFilename, self.imageToChange)
 
     def viewImage(self, image):
         image = imutils.resize(image, 800)
-        image = self.imageUtils.BGR2RGB(image)
+        image = IUtils.BGR2RGB(image)
         image = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         self.imageViewLabel.setPixmap(QtGui.QPixmap.fromImage(image))
 

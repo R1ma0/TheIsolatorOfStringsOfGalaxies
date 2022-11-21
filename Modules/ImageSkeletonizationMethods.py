@@ -138,7 +138,7 @@ class ZSSkeletonization(object):
             for x, y in stepTwoChanges:
                 self.matrix[x, y] = 0
 
-        IUtils.deleteSinglePixels(self.matrix, IUtils.getPixelNeighbours, rows, columns, 1)
+        self.matrix = IUtils.deleteSinglePixels(self.matrix, IUtils.getPixelNeighbours, rows, columns, 1)
 
         print("ZS skeletonization is done")
         return IUtils.makeChangesToSourceImage(self.matrix, image)
