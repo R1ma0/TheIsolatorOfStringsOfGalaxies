@@ -79,6 +79,9 @@ class Ui_MainWindow(object):
         self.setupVariables()
         
     def setupVariables(self):
+        self.selectedThresholdValue = None
+        self.gaussianBlockSizeValue = None
+        self.gaussianCValue = None
         self.binarizationMethodsList = [""] + binaryMethods
         self.binarizationMethods = ImageBinarization()
         self.opcaSkeletonization = OPCASkeletonization()

@@ -93,7 +93,7 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         font.setPointSize(10)
         self.thresholdValueSlider.setFont(font)
         self.thresholdValueSlider.setMaximum(255)
-        self.thresholdValueSlider.setProperty("value", 125)
+        self.thresholdValueSlider.setProperty("value", 0)
         self.thresholdValueSlider.setOrientation(QtCore.Qt.Horizontal)
         self.thresholdValueSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.thresholdValueSlider.setObjectName("thresholdValueSlider")
@@ -245,7 +245,7 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         setEnabled = True if methodIndex == 1 else False
         self.binaryThresholdGroupBox.setEnabled(setEnabled)
 
-        setEnabled = True if methodIndex == 3 else False
+        setEnabled = True if methodIndex == 2 else False
         self.adaptiveGaussianGroupBox.setEnabled(setEnabled)
 
         self.binarizationMethodChangedSignal.emit(methodIndex)
