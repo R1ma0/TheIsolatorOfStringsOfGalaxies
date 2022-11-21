@@ -53,11 +53,14 @@ class Ui_MainWindow(object):
         self.actionOPCAMethod.setObjectName("actionOPCAMethod")
         self.actionZSMethod = QtWidgets.QAction(MainWindow)
         self.actionZSMethod.setObjectName("actionZSMethod")
+        self.actionRemoveExtraPixels = QtWidgets.QAction(MainWindow)
+        self.actionRemoveExtraPixels.setObjectName("actionRemoveExtraPixels")
         self.menuFile.addAction(self.actionOpen_Image)
         self.menuFile.addAction(self.actionSave_Image)
         self.menuTools.addAction(self.actionBinarization)
         self.menuTools.addAction(self.actionResizeImage)
         self.menuTools.addAction(self.menuSkeletonization.menuAction())
+        self.menuTools.addAction(self.actionRemoveExtraPixels)
         self.menuSkeletonization.addAction(self.actionOPCAMethod)
         self.menuSkeletonization.addAction(self.actionZSMethod)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -70,6 +73,7 @@ class Ui_MainWindow(object):
         self.actionBinarization.triggered.connect(self.openBinarizationWindow)
         self.actionOPCAMethod.triggered.connect(self.performOPCASkeletonization)
         self.actionZSMethod.triggered.connect(self.performZSSkeletonization)
+        self.actionRemoveExtraPixels.triggered.connect(self.removeExtraPixels)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.setupVariables()
@@ -80,6 +84,9 @@ class Ui_MainWindow(object):
         self.opcaSkeletonization = OPCASkeletonization()
         self.zsSkeletonization = ZSSkeletonization()
         self.imageUtils = IUtils()
+
+    def removeExtraPixels(self):
+        print("removeExtraPixels()")
 
     def openBinarizationWindow(self):
         self.baseBinarizationWindow = QtWidgets.QMainWindow()
@@ -184,6 +191,7 @@ class Ui_MainWindow(object):
         self.actionResizeImage.setText(_translate("MainWindow", "Resize Image"))
         self.actionOPCAMethod.setText(_translate("MainWindow", "OPCA (One-Pass Combination Algorithm)"))
         self.actionZSMethod.setText(_translate("MainWindow", "ZS (Zhang-Suen Algorithm)"))
+        self.actionRemoveExtraPixels.setText(_translate("MainWindow", "Remove Extra Pixels"))
 
 if __name__ == "__main__":
     import sys
