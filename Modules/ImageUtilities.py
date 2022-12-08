@@ -25,11 +25,18 @@ class IUtils(object):
     @staticmethod
     def resizeImage(image: cv2.Mat, scalePercent: int) -> cv2.Mat:
         scaleValue = scalePercent / 100
-            
         width = int(image.shape[1] * scaleValue)
         height = int(image.shape[0] * scaleValue)
 
         return cv2.resize(image, (width, height), interpolation=cv2.INTER_CUBIC)
+
+    @staticmethod
+    def binarizeBinaryImage(image: cv2.Mat, threshold: int) -> cv2.Mat:
+        for x in range(0, image.shape[0]): # rows
+            for y in range(0, image.shape[1]): # columns
+                image[x, y] = 255 if image[x, y] > threshold else 0
+
+        return image
 
     @staticmethod
     def convertToBinaryMatrix(image: cv2.Mat) -> numpy.array:

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from threading import Thread
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Widgets.binarizationWindow import Ui_SkeletonitationWindow
 from Modules.ImageUtilities import IUtils
 from Modules.ImageBinarizationMethods import ImageBinarization, binaryMethods
 from Modules.ImageSkeletonizationMethods import OPCASkeletonization, ZSSkeletonization
+from win32api import GetSystemMetrics
 import imutils
 
 class Ui_MainWindow(object):
@@ -55,12 +57,15 @@ class Ui_MainWindow(object):
         self.actionZSMethod.setObjectName("actionZSMethod")
         self.actionRemoveExtraPixels = QtWidgets.QAction(MainWindow)
         self.actionRemoveExtraPixels.setObjectName("actionRemoveExtraPixels")
+        self.actionBinarizeBinaryImage = QtWidgets.QAction(MainWindow)
+        self.actionBinarizeBinaryImage.setObjectName("actionBinarizeBinaryImage")
         self.menuFile.addAction(self.actionOpen_Image)
         self.menuFile.addAction(self.actionSave_Image)
         self.menuTools.addAction(self.actionBinarization)
         self.menuTools.addAction(self.actionResizeImage)
         self.menuTools.addAction(self.menuSkeletonization.menuAction())
         self.menuTools.addAction(self.actionRemoveExtraPixels)
+        self.menuTools.addAction(self.actionBinarizeBinaryImage)
         self.menuSkeletonization.addAction(self.actionOPCAMethod)
         self.menuSkeletonization.addAction(self.actionZSMethod)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -74,6 +79,7 @@ class Ui_MainWindow(object):
         self.actionOPCAMethod.triggered.connect(self.performOPCASkeletonization)
         self.actionZSMethod.triggered.connect(self.performZSSkeletonization)
         self.actionRemoveExtraPixels.triggered.connect(self.removeExtraPixels)
+        self.actionBinarizeBinaryImage.triggered.connect(self.binarizeBinaryImage)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.setupVariables()
@@ -99,6 +105,7 @@ class Ui_MainWindow(object):
                 1
         )
         self.imageToChange = IUtils.makeChangesToSourceImage(matrix, self.imageToChange)
+        self.viewImage(self.imageToChange)
 
     def openBinarizationWindow(self):
         self.baseBinarizationWindow = QtWidgets.QMainWindow()
@@ -160,21 +167,33 @@ class Ui_MainWindow(object):
     def resizeImage(self): 
         imageScalingVariant = [str(x) for x in range(1, 100, 1)]
         element, isSelected = QtWidgets.QInputDialog.getItem(
-            MainWindow, "Resize", "%:", imageScalingVariant
+            MainWindow, "Resize RGB", "%:", imageScalingVariant
         )
 
         if isSelected:
             try:
                 self.imageToChange = IUtils.resizeImage(self.imageToChange, int(element))
-                self.viewImage(self.imageToChange)
             except Exception as e:
-                print(e)
+                self.imageToChange = IUtils.resizeImage(self.loadedImage, int(element))
+
+            self.loadedImage = self.imageToChange
+            self.viewImage(self.imageToChange)
+
+    def binarizeBinaryImage(self):
+        thresholdVariants = [str(x) for x in range(1, 255, 1)]
+        element, isSelected = QtWidgets.QInputDialog.getItem(
+            MainWindow, "Threshold Value", "Value:", thresholdVariants
+        )
+
+        if isSelected:
+            self.imageToChange = IUtils.binarizeBinaryImage(self.imageToChange, int(element))
+            self.viewImage(self.imageToChange)
 
     def loadImage(self):
-        self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg *.tif)")[0]
-        if not self.filename:
+        filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.png *.jpg *.tif)")[0]
+        if not filename:
             return
-        self.loadedImage = IUtils.readImageFrom(self.filename)
+        self.loadedImage = IUtils.readImageFrom(filename)
         self.actionBinarization.setEnabled(True)
         self.viewImage(self.loadedImage)
 
@@ -185,7 +204,14 @@ class Ui_MainWindow(object):
             IUtils.writeImageTo(saveToFilename, self.imageToChange)
 
     def viewImage(self, image):
-        image = imutils.resize(image, 800)
+        screenWidth = GetSystemMetrics(0) - 75
+        screenHeight = GetSystemMetrics(1) - 75
+
+        if image.shape[1] > image.shape[0]:
+            image = imutils.resize(image, screenWidth)
+        else:
+            image = imutils.resize(image, screenHeight)
+
         image = IUtils.BGR2RGB(image)
         image = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         self.imageViewLabel.setPixmap(QtGui.QPixmap.fromImage(image))
@@ -204,6 +230,7 @@ class Ui_MainWindow(object):
         self.actionOPCAMethod.setText(_translate("MainWindow", "OPCA (One-Pass Combination Algorithm)"))
         self.actionZSMethod.setText(_translate("MainWindow", "ZS (Zhang-Suen Algorithm)"))
         self.actionRemoveExtraPixels.setText(_translate("MainWindow", "Remove Extra Pixels"))
+        self.actionBinarizeBinaryImage.setText(_translate("MainWindow", "Binarize Binary Image"))
 
 if __name__ == "__main__":
     import sys

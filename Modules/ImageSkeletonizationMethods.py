@@ -39,9 +39,9 @@ class OPCASkeletonization(object):
                     if self.__isSatisfiesFourthCondition(neighbours):
                         self.matrix[row, col] = 0
 
-        IUtils.deleteSinglePixels(self.matrix, self.__getNeighbours, rows, colums, 2)
+        # IUtils.deleteSinglePixels(self.matrix, self.__getNeighbours, rows, colums, 2)
+        # print("OPCA skeletonization is done")
 
-        print("OPCA skeletonization is done")
         return IUtils.makeChangesToSourceImage(self.matrix, srcImage)
 
     def __getNeighbours(self, row: int, col: int) -> numpy.array:
@@ -138,9 +138,9 @@ class ZSSkeletonization(object):
             for x, y in stepTwoChanges:
                 self.matrix[x, y] = 0
 
-        self.matrix = IUtils.deleteSinglePixels(self.matrix, IUtils.getPixelNeighbours, rows, columns, 1)
-
-        print("ZS skeletonization is done")
+        # self.matrix = IUtils.deleteSinglePixels(self.matrix, IUtils.getPixelNeighbours, rows, columns, 1)
+        # print("ZS skeletonization is done")
+        
         return IUtils.makeChangesToSourceImage(self.matrix, image)
 
     def __getTransitions(self, neighbours: list) -> int:
