@@ -74,7 +74,7 @@ class IUtils(object):
 
         for i, j in pixelsToChange:
             matrix[i, j] = 0
-    
+            
         return matrix
 
     @staticmethod

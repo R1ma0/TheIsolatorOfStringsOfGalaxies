@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from threading import Thread
+import imutils
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Widgets.binarizationWindow import Ui_SkeletonitationWindow
 from Modules.ImageUtilities import IUtils
 from Modules.ImageBinarizationMethods import ImageBinarization, binaryMethods
-from Modules.ImageSkeletonizationMethods import OPCASkeletonization, ZSSkeletonization
+from Modules.ImageSkeletonizationMethods import ZSSkeletonization
 from win32api import GetSystemMetrics
-import imutils
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -51,8 +50,6 @@ class Ui_MainWindow(object):
         self.actionBinarization.setEnabled(False)
         self.actionResizeImage = QtWidgets.QAction(MainWindow)
         self.actionResizeImage.setObjectName("actionResizeImage")
-        self.actionOPCAMethod = QtWidgets.QAction(MainWindow)
-        self.actionOPCAMethod.setObjectName("actionOPCAMethod")
         self.actionZSMethod = QtWidgets.QAction(MainWindow)
         self.actionZSMethod.setObjectName("actionZSMethod")
         self.actionRemoveExtraPixels = QtWidgets.QAction(MainWindow)
@@ -66,7 +63,6 @@ class Ui_MainWindow(object):
         self.menuTools.addAction(self.menuSkeletonization.menuAction())
         self.menuTools.addAction(self.actionRemoveExtraPixels)
         self.menuTools.addAction(self.actionBinarizeBinaryImage)
-        self.menuSkeletonization.addAction(self.actionOPCAMethod)
         self.menuSkeletonization.addAction(self.actionZSMethod)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
@@ -76,7 +72,6 @@ class Ui_MainWindow(object):
         self.actionOpen_Image.triggered.connect(self.loadImage)
         self.actionSave_Image.triggered.connect(self.saveImage)
         self.actionBinarization.triggered.connect(self.openBinarizationWindow)
-        self.actionOPCAMethod.triggered.connect(self.performOPCASkeletonization)
         self.actionZSMethod.triggered.connect(self.performZSSkeletonization)
         self.actionRemoveExtraPixels.triggered.connect(self.removeExtraPixels)
         self.actionBinarizeBinaryImage.triggered.connect(self.binarizeBinaryImage)
@@ -90,18 +85,15 @@ class Ui_MainWindow(object):
         self.gaussianCValue = None
         self.binarizationMethodsList = [""] + binaryMethods
         self.binarizationMethods = ImageBinarization()
-        self.opcaSkeletonization = OPCASkeletonization()
         self.zsSkeletonization = ZSSkeletonization()
 
     def removeExtraPixels(self):
         matrix = IUtils.convertToBinaryMatrix(self.imageToChange)
-        rows = self.imageToChange.shape[0]
-        cols = self.imageToChange.shape[1]
         matrix = IUtils.deleteSinglePixels(
                 matrix, 
                 IUtils.getPixelNeighbours,
-                rows,
-                cols,
+                self.imageToChange.shape[0],
+                self.imageToChange.shape[1],
                 1
         )
         self.imageToChange = IUtils.makeChangesToSourceImage(matrix, self.imageToChange)
@@ -154,10 +146,6 @@ class Ui_MainWindow(object):
         else:
             pass
 
-        self.viewImage(self.imageToChange)
-
-    def performOPCASkeletonization(self):
-        self.imageToChange = self.opcaSkeletonization.execute(self.imageToChange)
         self.viewImage(self.imageToChange)
 
     def performZSSkeletonization(self):
@@ -227,7 +215,6 @@ class Ui_MainWindow(object):
         self.actionSave_Image.setText(_translate("MainWindow", "Save Image"))
         self.actionBinarization.setText(_translate("MainWindow", "Binarization"))
         self.actionResizeImage.setText(_translate("MainWindow", "Resize Image"))
-        self.actionOPCAMethod.setText(_translate("MainWindow", "OPCA (One-Pass Combination Algorithm)"))
         self.actionZSMethod.setText(_translate("MainWindow", "ZS (Zhang-Suen Algorithm)"))
         self.actionRemoveExtraPixels.setText(_translate("MainWindow", "Remove Extra Pixels"))
         self.actionBinarizeBinaryImage.setText(_translate("MainWindow", "Binarize Binary Image"))
