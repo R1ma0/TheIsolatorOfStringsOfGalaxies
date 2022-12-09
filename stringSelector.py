@@ -83,6 +83,7 @@ class Ui_MainWindow(object):
         self.selectedThresholdValue = None
         self.gaussianBlockSizeValue = None
         self.gaussianCValue = None
+        self.gaussianMaxThresholdValue = None
         self.binarizationMethodsList = [""] + binaryMethods
         self.binarizationMethods = ImageBinarization()
         self.zsSkeletonization = ZSSkeletonization()
@@ -110,7 +111,13 @@ class Ui_MainWindow(object):
         self.binarizationWindow.gaussianCValueSliderSignal.connect(self.setGaussianCValue)
         self.binarizationWindow.gaussianBlockSizeSpinBoxSignal.connect(self.setGaussianBlockSizeValue)
         self.binarizationWindow.gaussianBlockSizeValueSliderSignal.connect(self.setGaussianBlockSizeValue)
+        self.binarizationWindow.gaussianMaxThresholdSliderSignal.connect(self.setGaussianMaxThresholdValue)
+        self.binarizationWindow.gaussianMaxThresholdSpinBoxSignal.connect(self.setGaussianMaxThresholdValue)
         self.baseBinarizationWindow.show()
+
+    def setGaussianMaxThresholdValue(self, value):
+        self.gaussianMaxThresholdValue = value
+        self.applyBinarizationMethodToImage()
 
     def setGaussianCValue(self, value):
         self.gaussianCValue = value
@@ -139,7 +146,8 @@ class Ui_MainWindow(object):
             )
         elif self.selectedBinarizationMethod == 2:
             self.imageToChange = self.binarizationMethods.convertUsingAdaptiveGaussianBinarization(
-                self.loadedImage, self.gaussianBlockSizeValue, self.gaussianCValue
+                self.loadedImage, self.gaussianBlockSizeValue, 
+                self.gaussianCValue, self.gaussianMaxThresholdValue
             )
         elif self.selectedBinarizationMethod == 3:
             self.imageToChange = self.binarizationMethods.convertUsingOtsuThresholding(self.loadedImage)

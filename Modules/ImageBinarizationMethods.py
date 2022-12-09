@@ -21,15 +21,16 @@ class ImageBinarization(object):
         """
         return cv2.threshold(self.imageUtils.BGR2GRAY(image), thresholdValue, 255, cv2.THRESH_BINARY)[1]
 
-    def convertUsingAdaptiveGaussianBinarization(self, image: cv2.Mat, blockSize: int, c: float) -> cv2.Mat:
+    def convertUsingAdaptiveGaussianBinarization(self, image: cv2.Mat, blockSize: int, c: float, maxThreshold: int) -> cv2.Mat:
         """
         Converts the source image to a binary using adaptive Gaussian binarization
         """
-        if blockSize == None: blockSize = 3
-        if c == None: c = 0
+        blockSize = 3 if blockSize == None else blockSize
+        c = 0 if c == None else c
+        maxThreshold = 255 if maxThreshold == None else maxThreshold
 
         return cv2.adaptiveThreshold(
-            self.imageUtils.BGR2GRAY(image), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, c
+            self.imageUtils.BGR2GRAY(image), maxThreshold, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, c
         )
 
     def convertUsingOtsuThresholding(self, image: cv2.Mat):
