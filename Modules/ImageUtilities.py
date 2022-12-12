@@ -66,20 +66,26 @@ class IUtils(object):
         """
         isRemoveOperation = operation == "remove"
         isFillOperation = operation == "fill"
-        pixelsToChange = []
+        isNotAllPixelsChanged = True
 
-        for i in range(1, matrix.shape[0] - 1):
-            for j in range(1, matrix.shape[1] - 1):
-                neighbours = IUtils.getPixelNeighbours(matrix, i, j)
-                if isRemoveOperation and matrix[i, j] == 1:
-                    if IUtils.isPixelCanBeRemoved(neighbours):
-                        pixelsToChange.append((i, j))
-                if isFillOperation and matrix[i, j] == 0:
-                    if IUtils.isPixelCanBeFilled(neighbours):
-                        pixelsToChange.append((i, j))
+        while isNotAllPixelsChanged:
+            pixelsToChange = []
 
-        for i, j in pixelsToChange:
-            matrix[i, j] = 0 if isRemoveOperation else 1
+            for i in range(1, matrix.shape[0] - 1):
+                for j in range(1, matrix.shape[1] - 1):
+                    neighbours = IUtils.getPixelNeighbours(matrix, i, j)
+                    if isRemoveOperation and matrix[i, j] == 1:
+                        if IUtils.isPixelCanBeRemoved(neighbours):
+                            pixelsToChange.append((i, j))
+                    if isFillOperation and matrix[i, j] == 0:
+                        if IUtils.isPixelCanBeFilled(neighbours):
+                            pixelsToChange.append((i, j))
+
+            for i, j in pixelsToChange:
+                matrix[i, j] = 0 if isRemoveOperation else 1
+
+            if not pixelsToChange:
+                isNotAllPixelsChanged = False
 
         return matrix
 
