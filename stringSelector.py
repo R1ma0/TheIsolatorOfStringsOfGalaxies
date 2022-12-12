@@ -54,6 +54,8 @@ class Ui_MainWindow(object):
         self.actionZSMethod.setObjectName("actionZSMethod")
         self.actionRemoveExtraPixels = QtWidgets.QAction(MainWindow)
         self.actionRemoveExtraPixels.setObjectName("actionRemoveExtraPixels")
+        self.actionFillMissingPixels = QtWidgets.QAction(MainWindow)
+        self.actionFillMissingPixels.setObjectName("actionFillMissingPixels")
         self.actionBinarizeBinaryImage = QtWidgets.QAction(MainWindow)
         self.actionBinarizeBinaryImage.setObjectName("actionBinarizeBinaryImage")
         self.menuFile.addAction(self.actionOpen_Image)
@@ -62,6 +64,7 @@ class Ui_MainWindow(object):
         self.menuTools.addAction(self.actionResizeImage)
         self.menuTools.addAction(self.menuSkeletonization.menuAction())
         self.menuTools.addAction(self.actionRemoveExtraPixels)
+        self.menuTools.addAction(self.actionFillMissingPixels)
         self.menuTools.addAction(self.actionBinarizeBinaryImage)
         self.menuSkeletonization.addAction(self.actionZSMethod)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -74,6 +77,7 @@ class Ui_MainWindow(object):
         self.actionBinarization.triggered.connect(self.openBinarizationWindow)
         self.actionZSMethod.triggered.connect(self.performZSSkeletonization)
         self.actionRemoveExtraPixels.triggered.connect(self.removeExtraPixels)
+        self.actionFillMissingPixels.triggered.connect(self.fillMissingPixels)
         self.actionBinarizeBinaryImage.triggered.connect(self.binarizeBinaryImage)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -90,13 +94,13 @@ class Ui_MainWindow(object):
 
     def removeExtraPixels(self):
         matrix = IUtils.convertToBinaryMatrix(self.imageToChange)
-        matrix = IUtils.deleteSinglePixels(
-                matrix, 
-                IUtils.getPixelNeighbours,
-                self.imageToChange.shape[0],
-                self.imageToChange.shape[1],
-                1
-        )
+        matrix = IUtils.performFollowingOperationWithPixels("remove", matrix)
+        self.imageToChange = IUtils.makeChangesToSourceImage(matrix, self.imageToChange)
+        self.viewImage(self.imageToChange)
+
+    def fillMissingPixels(self):
+        matrix = IUtils.convertToBinaryMatrix(self.imageToChange)
+        matrix = IUtils.performFollowingOperationWithPixels("fill", matrix)
         self.imageToChange = IUtils.makeChangesToSourceImage(matrix, self.imageToChange)
         self.viewImage(self.imageToChange)
 
@@ -176,7 +180,7 @@ class Ui_MainWindow(object):
             self.viewImage(self.imageToChange)
 
     def binarizeBinaryImage(self):
-        thresholdVariants = [str(x) for x in range(1, 255, 1)]
+        thresholdVariants = [str(x) for x in range(0, 256, 1)]
         element, isSelected = QtWidgets.QInputDialog.getItem(
             MainWindow, "Threshold Value", "Value:", thresholdVariants
         )
@@ -225,6 +229,7 @@ class Ui_MainWindow(object):
         self.actionResizeImage.setText(_translate("MainWindow", "Resize Image"))
         self.actionZSMethod.setText(_translate("MainWindow", "ZS (Zhang-Suen Algorithm)"))
         self.actionRemoveExtraPixels.setText(_translate("MainWindow", "Remove Extra Pixels"))
+        self.actionFillMissingPixels.setText(_translate("MainWindow", "Fill Missing Pixels"))
         self.actionBinarizeBinaryImage.setText(_translate("MainWindow", "Binarize Binary Image"))
 
 if __name__ == "__main__":

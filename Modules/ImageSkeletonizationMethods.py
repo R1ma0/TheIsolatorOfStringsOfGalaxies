@@ -31,6 +31,7 @@ class ZSSkeletonization(object):
 
             for x, y in stepOneChanges:
                 self.matrix[x, y] = 0
+                
             # Step 2
             stepTwoChanges = []
             for x in range(1, rows - 1):
@@ -47,9 +48,6 @@ class ZSSkeletonization(object):
 
             for x, y in stepTwoChanges:
                 self.matrix[x, y] = 0
-
-        # self.matrix = IUtils.deleteSinglePixels(self.matrix, IUtils.getPixelNeighbours, rows, columns, 1)
-        # print("ZS skeletonization is done")
         
         return IUtils.makeChangesToSourceImage(self.matrix, image)
 
