@@ -12,14 +12,11 @@ class ImageBinarization(object):
     """ 
     The class implements image binarization methods
     """
-    def __init__(self):
-        self.imageUtils = IUtils()
-
     def convertUsingThresholdBinarization(self, image: cv2.Mat, thresholdValue: int) -> cv2.Mat:
         """
         Converts the source image to a binary using threshold binarization
         """
-        return cv2.threshold(self.imageUtils.BGR2GRAY(image), thresholdValue, 255, cv2.THRESH_BINARY)[1]
+        return cv2.threshold(IUtils.BGR2GRAY(image), thresholdValue, 255, cv2.THRESH_BINARY)[1]
 
     def convertUsingAdaptiveGaussianBinarization(self, image: cv2.Mat, blockSize: int, c: float, maxThreshold: int) -> cv2.Mat:
         """
@@ -30,8 +27,8 @@ class ImageBinarization(object):
         maxThreshold = 255 if maxThreshold == None else maxThreshold
 
         return cv2.adaptiveThreshold(
-            self.imageUtils.BGR2GRAY(image), maxThreshold, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, c
+            IUtils.BGR2GRAY(image), maxThreshold, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, c
         )
 
     def convertUsingOtsuThresholding(self, image: cv2.Mat):
-        return cv2.threshold(self.imageUtils.BGR2GRAY(image), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        return cv2.threshold(IUtils.BGR2GRAY(image), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
