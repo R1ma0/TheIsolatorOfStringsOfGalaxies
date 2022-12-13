@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import imutils
+import tkinter as tk
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Widgets.binarizationWindow import Ui_SkeletonitationWindow
 from Modules.ImageUtilities import IUtils
 from Modules.ImageBinarizationMethods import ImageBinarization, binaryMethods
 from Modules.ImageSkeletonizationMethods import ZSSkeletonization
-from win32api import GetSystemMetrics
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -84,6 +84,9 @@ class Ui_MainWindow(object):
         self.setupVariables()
         
     def setupVariables(self):
+        root = tk.Tk()
+        self.screenWidth = root.winfo_screenwidth()
+        self.screenHeight = root.winfo_screenheight()
         self.selectedThresholdValue = None
         self.gaussianBlockSizeValue = None
         self.gaussianCValue = None
@@ -204,13 +207,12 @@ class Ui_MainWindow(object):
             IUtils.writeImageTo(saveToFilename, self.imageToChange)
 
     def viewImage(self, image):
-        screenWidth = GetSystemMetrics(0) - 75
-        screenHeight = GetSystemMetrics(1) - 75
+        edgeIndent = 75
 
         if image.shape[1] > image.shape[0]:
-            image = imutils.resize(image, screenWidth)
+            image = imutils.resize(image, self.screenWidth - edgeIndent)
         else:
-            image = imutils.resize(image, screenHeight)
+            image = imutils.resize(image, self.screenHeight - edgeIndent)
 
         image = IUtils.BGR2RGB(image)
         image = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
@@ -218,7 +220,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "String Selector v0.2.1"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "String Selector"))
         self.imageViewLabel.setText(_translate("MainWindow", "Image View"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTools.setTitle(_translate("MainWindow", "Tools"))
