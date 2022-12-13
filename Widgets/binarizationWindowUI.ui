@@ -404,71 +404,26 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_8">
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QRadioButton" name="gaussLivePreviewRadioBtn">
          <property name="text">
-          <string>Max threshold value</string>
+          <string>Live preview</string>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="maxThresholdValueSpinBox">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>255</number>
-         </property>
-         <property name="value">
-          <number>255</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
-       <item>
-        <widget class="QLabel" name="maxThresholdMinValue">
+        <widget class="QRadioButton" name="gaussConfirmationRadioBtn">
          <property name="text">
-          <string>1</string>
-         </property>
-         <property name="margin">
-          <number>5</number>
+          <string>With confirmation</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="maxThresholdValueSlider">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>255</number>
-         </property>
-         <property name="value">
-          <number>255</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBelow</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="maxThresholdMaxValue">
+        <widget class="QPushButton" name="gaussApplyingTheChanges">
          <property name="text">
-          <string>255</string>
-         </property>
-         <property name="margin">
-          <number>5</number>
+          <string>Apply</string>
          </property>
         </widget>
        </item>

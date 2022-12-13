@@ -11,8 +11,6 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
     gaussianCValueSliderSignal = QtCore.pyqtSignal(float)
     gaussianBlockSizeSpinBoxSignal = QtCore.pyqtSignal(int)
     gaussianBlockSizeValueSliderSignal = QtCore.pyqtSignal(int)
-    gaussianMaxThresholdSliderSignal = QtCore.pyqtSignal(int)
-    gaussianMaxThresholdSpinBoxSignal = QtCore.pyqtSignal(int)
     binarizationMethodsList = [""] + binaryMethods
 
     def setupUi(self, SkeletonitationWindow):
@@ -205,35 +203,17 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.verticalLayout_2.addWidget(self.line_3)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        self.label_3 = QtWidgets.QLabel(self.layoutWidget2)
-        self.label_3.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.label_3.setObjectName("label_3")
-        self.horizontalLayout_8.addWidget(self.label_3)
-        self.maxThresholdValueSpinBox = QtWidgets.QSpinBox(self.layoutWidget2)
-        self.maxThresholdValueSpinBox.setProperty("showGroupSeparator", False)
-        self.maxThresholdValueSpinBox.setMinimum(1)
-        self.maxThresholdValueSpinBox.setMaximum(255)
-        self.maxThresholdValueSpinBox.setProperty("value", 255)
-        self.maxThresholdValueSpinBox.setObjectName("maxThresholdValueSpinBox")
-        self.horizontalLayout_8.addWidget(self.maxThresholdValueSpinBox)
+        self.gaussLivePreviewRadioBtn = QtWidgets.QRadioButton(self.layoutWidget2)
+        self.gaussLivePreviewRadioBtn.setChecked(True)
+        self.gaussLivePreviewRadioBtn.setObjectName("gaussLivePreviewRadioBtn")
+        self.horizontalLayout_8.addWidget(self.gaussLivePreviewRadioBtn)
+        self.gaussConfirmationRadioBtn = QtWidgets.QRadioButton(self.layoutWidget2)
+        self.gaussConfirmationRadioBtn.setObjectName("gaussConfirmationRadioBtn")
+        self.horizontalLayout_8.addWidget(self.gaussConfirmationRadioBtn)
+        self.gaussApplyingTheChanges = QtWidgets.QPushButton(self.layoutWidget2)
+        self.gaussApplyingTheChanges.setObjectName("gaussApplyingTheChanges")
+        self.horizontalLayout_8.addWidget(self.gaussApplyingTheChanges)
         self.verticalLayout_2.addLayout(self.horizontalLayout_8)
-        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-        self.maxThresholdMinValue = QtWidgets.QLabel(self.layoutWidget2)
-        self.maxThresholdMinValue.setObjectName("maxThresholdMinValue")
-        self.horizontalLayout_9.addWidget(self.maxThresholdMinValue)
-        self.maxThresholdValueSlider = QtWidgets.QSlider(self.layoutWidget2)
-        self.maxThresholdValueSlider.setMinimum(1)
-        self.maxThresholdValueSlider.setMaximum(255)
-        self.maxThresholdValueSlider.setProperty("value", 255)
-        self.maxThresholdValueSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.maxThresholdValueSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
-        self.maxThresholdValueSlider.setObjectName("maxThresholdValueSlider")
-        self.horizontalLayout_9.addWidget(self.maxThresholdValueSlider)
-        self.maxThresholdMaxValue = QtWidgets.QLabel(self.layoutWidget2)
-        self.maxThresholdMaxValue.setObjectName("maxThresholdMaxValue")
-        self.horizontalLayout_9.addWidget(self.maxThresholdMaxValue)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_9)
 
         self.retranslateUi(SkeletonitationWindow)
         # Enables
@@ -248,33 +228,37 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.gaussianBlockSizeValueSlider.valueChanged.connect(self.onGaussianBlockSizeSliderChanged)
         self.gaussianCSpinBox.valueChanged.connect(self.onGaussianCSpinBoxChanged)
         self.gaussianCValueSlider.valueChanged.connect(self.onGaussianCSliderChanged)
-        self.maxThresholdValueSlider.valueChanged.connect(self.onGaussianMaxThresholdSliderChanged)
-        self.maxThresholdValueSpinBox.valueChanged.connect(self.onGaussianMaxThresholdSpinBoxChanged)
+        self.gaussApplyingTheChanges.clicked.connect(self.onGaussianApplyButtonClicked)
         QtCore.QMetaObject.connectSlotsByName(SkeletonitationWindow)
 
-    def onGaussianMaxThresholdSliderChanged(self, value):
-        self.maxThresholdValueSpinBox.setValue(value)
-        self.gaussianMaxThresholdSliderSignal.emit(value)
+    def onGaussianApplyButtonClicked(self):
+        if not self.gaussConfirmationRadioBtn.isChecked():
+            return
 
-    def onGaussianMaxThresholdSpinBoxChanged(self, value):
-        self.maxThresholdValueSlider.setValue(value)
-        self.gaussianMaxThresholdSpinBoxSignal.emit(value)
+        self.gaussianCSpinBoxSignal.emit(self.gaussianCSpinBox.value())
+        self.gaussianCValueSliderSignal.emit(self.gaussianCValueSlider.value())
+        self.gaussianBlockSizeSpinBoxSignal.emit(self.gaussianBlockSizeSpinBox.value())
+        self.gaussianBlockSizeValueSliderSignal.emit(self.gaussianBlockSizeValueSlider.value())
 
     def onGaussianCSpinBoxChanged(self, value):
         self.gaussianCValueSlider.setValue(value)
-        self.gaussianCSpinBoxSignal.emit(value)
+        if self.gaussLivePreviewRadioBtn.isChecked():
+            self.gaussianCSpinBoxSignal.emit(value)
 
     def onGaussianCSliderChanged(self, value):
         self.gaussianCSpinBox.setValue(value)
-        self.gaussianCValueSliderSignal.emit(value)
+        if self.gaussLivePreviewRadioBtn.isChecked():
+            self.gaussianCValueSliderSignal.emit(value)
 
     def onGaussianBlockSizeSpinBoxChanged(self, value):
         self.gaussianBlockSizeValueSlider.setValue(value)
-        self.gaussianBlockSizeSpinBoxSignal.emit(value)
+        if self.gaussLivePreviewRadioBtn.isChecked():
+            self.gaussianBlockSizeSpinBoxSignal.emit(value)
 
     def onGaussianBlockSizeSliderChanged(self, value):
         self.gaussianBlockSizeSpinBox.setValue(value)
-        self.gaussianBlockSizeValueSliderSignal.emit(value)
+        if self.gaussLivePreviewRadioBtn.isChecked():
+            self.gaussianBlockSizeValueSliderSignal.emit(value)
 
     def onThresholdSliderValueChanged(self, value):
         self.binaryThresholdValueSpinBox.setValue(value)
@@ -310,10 +294,9 @@ class Ui_SkeletonitationWindow(QtWidgets.QWidget):
         self.label_2.setText(_translate("SkeletonitationWindow", "C = "))
         self.gaussianCMinValueLabel.setText(_translate("SkeletonitationWindow", "-100"))
         self.gaussianCMaxValueLabel.setText(_translate("SkeletonitationWindow", "100"))
-        self.label_3.setText(_translate("SkeletonitationWindow", "Max threshold value"))
-        self.maxThresholdMinValue.setText(_translate("SkeletonitationWindow", "1"))
-        self.maxThresholdMaxValue.setText(_translate("SkeletonitationWindow", "255"))
-
+        self.gaussLivePreviewRadioBtn.setText(_translate("SkeletonitationWindow", "Live preview"))
+        self.gaussConfirmationRadioBtn.setText(_translate("SkeletonitationWindow", "With confirmation"))
+        self.gaussApplyingTheChanges.setText(_translate("SkeletonitationWindow", "Apply"))
 
 if __name__ == "__main__":
     import sys

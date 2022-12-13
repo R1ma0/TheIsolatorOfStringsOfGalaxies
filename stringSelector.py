@@ -118,13 +118,7 @@ class Ui_MainWindow(object):
         self.binarizationWindow.gaussianCValueSliderSignal.connect(self.setGaussianCValue)
         self.binarizationWindow.gaussianBlockSizeSpinBoxSignal.connect(self.setGaussianBlockSizeValue)
         self.binarizationWindow.gaussianBlockSizeValueSliderSignal.connect(self.setGaussianBlockSizeValue)
-        self.binarizationWindow.gaussianMaxThresholdSliderSignal.connect(self.setGaussianMaxThresholdValue)
-        self.binarizationWindow.gaussianMaxThresholdSpinBoxSignal.connect(self.setGaussianMaxThresholdValue)
         self.baseBinarizationWindow.show()
-
-    def setGaussianMaxThresholdValue(self, value):
-        self.gaussianMaxThresholdValue = value
-        self.applyBinarizationMethodToImage()
 
     def setGaussianCValue(self, value):
         self.gaussianCValue = value
